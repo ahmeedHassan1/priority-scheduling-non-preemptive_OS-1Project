@@ -1,0 +1,62 @@
+.gantt-chart {
+    margin-top: 20px;
+    color: #e0e0e0;
+}
+
+.chart-container {
+    display: flex;
+    border: 1px solid #444;
+    height: 50px;
+    background-color: #1e1e1e;
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.chart-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #e0e0e0;
+    border-right: 1px solid #333;
+}
+
+.chart-block:nth-child(odd) {
+    background-color: #2a2a2a;
+}
+
+.chart-block:nth-child(even) {
+    background-color: #5e5e5e;
+}
+
+.chart-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -50px;
+    font-size: 12px;
+    color: #e0e0e0;
+    position: relative;
+    height: 80px;
+    align-items: center;
+}
+
+.chart-timeline span {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    background-color: #444;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #e0e0e0;
+}
+
+.chart-timeline span.above {
+    top: -30px;
+}
+
+.chart-timeline span.below {
+    top: auto;
+    bottom: 0;
+}

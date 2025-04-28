@@ -1,0 +1,81 @@
+import { useState } from "react";
+import GanttChart from "./components/GanttChart";
+import ProcessInputForm from "./components/ProcessInputForm";
+import ResultsTable from "./components/ResultsTable";
+import AverageTimes from "./components/AverageTimes";
+import { calculateAverages, sortProcessesByPriority } from "./utils";
+import "./App.css";
+
+function App() {
+	const [processes, setProcesses] = useState([]);
+	const [numProcesses, setNumProcesses] = useState(0);
+	const [results, setResults] = useState(null);
+
+	const handleAddProcesses = () => {
+		const newProcesses = Array.from({ length: numProcesses }, (_, i) => ({
+			id: i + 1,
+			arrivalTime: 0,
+			burstTime: 0,
+			priority: 0
+		}));
+		setProcesses(newProcesses);
+	};
+
+	const handleInputChange = (index, field, value) => {
+		const updatedProcesses = [...processes];
+		updatedProcesses[index][field] = parseInt(value, 10) || 0;
+		setProcesses(updatedProcesses);
+	};
+
+	const calculateScheduling = () => {
+		const sortedProcesses = sortProcessesByPriority(processes);
+		let currentTime = 0;
+		const results = sortedProcesses.map((process) => {
+			const waitingTime = Math.max(0, currentTime - process.arrivalTime);
+			const turnaroundTime = waitingTime + process.burstTime;
+			currentTime += process.burstTime;
+			return { ...process, waitingTime, turnaroundTime };
+		});
+
+		const { avgWaitingTime, avgTurnaroundTime } =
+			calculateAverages(results);
+
+		setResults({ results, avgWaitingTime, avgTurnaroundTime });
+	};
+
+	return (
+		<div className="App">
+			<h1>Priority Scheduling (Non-Preemptive)</h1>
+			<div>
+				<label>
+					Number of Processes:
+					<input
+						type="number"
+						value={numProcesses}
+						onChange={(e) => setNumProcesses(parseInt(e.target.value, 10) || 0)}
+					/>
+				</label>
+				<button onClick={handleAddProcesses}>Add Processes</button>
+			</div>
+			{processes.length > 0 && (
+				<ProcessInputForm
+					processes={processes}
+					handleInputChange={handleInputChange}
+					calculateScheduling={calculateScheduling}
+				/>
+			)}
+			{results && (
+				<div>
+					<ResultsTable results={results.results} />
+					<AverageTimes
+						avgWaitingTime={results.avgWaitingTime}
+						avgTurnaroundTime={results.avgTurnaroundTime}
+					/>
+					<GanttChart processes={results.results} />
+				</div>
+			)}
+		</div>
+	);
+}
+
+export default App;
