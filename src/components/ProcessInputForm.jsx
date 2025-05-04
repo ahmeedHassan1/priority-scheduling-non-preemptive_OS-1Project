@@ -1,12 +1,30 @@
 import React from "react";
+import { toast } from "react-toastify";
 
-function ProcessInputForm({
-	processes,
-	handleInputChange,
-	calculateScheduling
-}) {
+function ProcessInputForm({ processes, setProcesses, calculateScheduling }) {
+	const handleInputChange = (index, field, value) => {
+		const updatedProcesses = [...processes];
+		updatedProcesses[index][field] = parseInt(value, 10) || 0;
+		setProcesses(updatedProcesses);
+	};
+
+	const handleCalculateClick = (e) => {
+		e.preventDefault();
+		const hasInvalidValues = processes.some(
+			(process) =>
+				process.arrivalTime < 0 || process.burstTime < 0 || process.priority < 0
+		);
+
+		if (hasInvalidValues) {
+			toast.error("All values must be 0 or greater.");
+			return;
+		}
+
+		calculateScheduling();
+	};
+
 	return (
-		<div>
+		<form onSubmit={handleCalculateClick}>
 			<h2>Enter Process Details</h2>
 			{processes.map((process, index) => (
 				<div key={process.id}>
@@ -26,7 +44,6 @@ function ProcessInputForm({
 						}
 					/>
 					<input
-					
 						type="number"
 						placeholder="Priority"
 						onChange={(e) =>
@@ -35,8 +52,10 @@ function ProcessInputForm({
 					/>
 				</div>
 			))}
-			<button style={{ marginTop: "20px" }} onClick={calculateScheduling}>Calculate</button>
-		</div>
+			<button style={{ marginTop: "20px" }} type="submit">
+				Calculate
+			</button>
+		</form>
 	);
 }
 
