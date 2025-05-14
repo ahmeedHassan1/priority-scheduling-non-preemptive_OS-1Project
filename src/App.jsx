@@ -57,6 +57,7 @@ function App() {
 			{processes.length > 0 && (
 				<ProcessInputForm
 					processes={processes}
+					setProcesses={setProcesses}
 					calculateScheduling={calculateScheduling}
 				/>
 			)}

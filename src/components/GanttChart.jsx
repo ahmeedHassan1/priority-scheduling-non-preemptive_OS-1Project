@@ -2,50 +2,58 @@ import React from "react";
 import "./GanttChart.css";
 
 function GanttChart({ processes }) {
-	const totalTime = processes.reduce(
-		(sum, process) => sum + process.burstTime,
-		0
-	);
+	const timeline = [];
+	let currentTime = 0;
 
-	const timeline = processes.reduce((acc, process, index) => {
-		const startTime = index === 0 ? 0 : acc[index - 1].endTime;
+	for (const process of processes) {
+		if (process.arrivalTime > currentTime) {
+			timeline.push({
+				id: "IDLE",
+				startTime: currentTime,
+				endTime: process.arrivalTime
+			});
+			currentTime = process.arrivalTime;
+		}
+
+		const startTime = Math.max(currentTime, process.arrivalTime);
 		const endTime = startTime + process.burstTime;
-		acc.push({ startTime, endTime });
-		return acc;
-	}, []);
+		timeline.push({ id: process.id, startTime, endTime });
+		currentTime = endTime;
+	}
+
+	const totalTime = timeline[timeline.length - 1].endTime;
 
 	return (
 		<div className="gantt-chart">
 			<h2 style={{ marginBottom: "30px" }}>Gantt Chart</h2>
 			<div className="chart-container">
-				{processes.map((process) => (
+				{timeline.map(({ id, startTime, endTime }, index) => (
 					<div
-						key={process.id}
+						key={id + "-" + startTime}
 						className="chart-block"
-						style={{ flex: process.burstTime / totalTime }}>
-						P{process.id}
+						style={{
+							flex: (endTime - startTime) / totalTime
+						}}>
+						{typeof id === "number" ? `P${id}` : id}
 					</div>
 				))}
 			</div>
+
 			<div className="chart-timeline">
-				{timeline.map((time, index) => (
+				{timeline.map(({ startTime }, index) => (
 					<span
-						key={time.startTime}
+						key={startTime}
 						className={index % 2 === 0 ? "above" : "below"}
 						style={{
-							position: "absolute",
-							left: `${(time.startTime / totalTime) * 100}%`,
-							transform: "translateX(-50%)"
+							left: `${(startTime / totalTime) * 100}%`
 						}}>
-						{time.startTime}
+						{startTime}
 					</span>
 				))}
 				<span
 					className={timeline.length % 2 === 0 ? "above" : "below"}
 					style={{
-						position: "absolute",
-						left: "100%",
-						transform: "translateX(-50%)"
+						left: "100%"
 					}}>
 					{totalTime}
 				</span>

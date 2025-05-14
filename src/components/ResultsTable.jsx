@@ -16,6 +16,9 @@ function ResultsTable({ results }) {
 						<th>Process</th>
 						<th>Waiting Time</th>
 						<th>Turnaround Time</th>
+						<th>Arrival Time</th>
+						<th>Burst Time</th>
+						<th>Priority</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -24,6 +27,9 @@ function ResultsTable({ results }) {
 							<td>{process.id}</td>
 							<td>{process.waitingTime}</td>
 							<td>{process.turnaroundTime}</td>
+							<td>{process.arrivalTime}</td>
+							<td>{process.burstTime}</td>
+							<td>{process.priority}</td>
 						</tr>
 					))}
 				</tbody>
