@@ -10,13 +10,23 @@ function ProcessInputForm({ processes, setProcesses, calculateScheduling }) {
 
 	const handleCalculateClick = (e) => {
 		e.preventDefault();
-		const hasInvalidValues = processes.some(
+		const hasNegativeValues = processes.some(
 			(process) =>
 				process.arrivalTime < 0 || process.burstTime < 0 || process.priority < 0
 		);
 
-		if (hasInvalidValues) {
+		const hasBurstPriorityValues = processes.some(
+			(process) =>
+				process.burstTime <= 0 || process.priority <= 0
+		);
+
+		if (hasNegativeValues) {
 			toast.error("All values must be 0 or greater.");
+			return;
+		}
+
+		if (hasBurstPriorityValues) {
+			toast.error("Burst and Priority Time must be greater than 0.");
 			return;
 		}
 
