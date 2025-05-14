@@ -24,21 +24,46 @@ function App() {
 	};
 
 	const calculateScheduling = () => {
-		const sortedProcesses = sortProcessesByPriority(processes);
+		const processesCopy = [...processes];
+		const completed = [];
 		let currentTime = 0;
-		const results = sortedProcesses.map((process) => {
-			const waitingTime = Math.max(0, currentTime - process.arrivalTime);
-			const turnaroundTime = waitingTime + process.burstTime;
-			currentTime += process.burstTime;
-			return { ...process, waitingTime, turnaroundTime };
+	
+		while (completed.length < processesCopy.length) {
+			const available = processesCopy
+				.filter(p => p.arrivalTime <= currentTime && !p.completed)
+				.sort((a, b) => a.priority - b.priority);
+			if (available.length === 0) {
+				currentTime++;
+				continue;
+			}
+	
+			const currentProcess = available[0];
+			const waitingTime = currentTime - currentProcess.arrivalTime;
+			const turnaroundTime = waitingTime + currentProcess.burstTime;
+	
+			completed.push({
+				...currentProcess,
+				startTime: currentTime,
+				waitingTime,
+				turnaroundTime,
+				finishTime: currentTime + currentProcess.burstTime,
+			});
+	
+			currentProcess.completed = true;
+			currentTime += currentProcess.burstTime;
+		}
+	
+		const { avgWaitingTime, avgTurnaroundTime } = calculateAverages(completed);
+	
+		setResults({
+			results: completed,
+			avgWaitingTime,
+			avgTurnaroundTime,
 		});
-
-		const { avgWaitingTime, avgTurnaroundTime } = calculateAverages(results);
-
-		setResults({ results, avgWaitingTime, avgTurnaroundTime });
-
+	
 		toast.success("Scheduling calculations completed successfully!");
 	};
+	
 
 	return (
 		<div className="App">
